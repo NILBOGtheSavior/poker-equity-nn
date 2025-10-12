@@ -1,6 +1,7 @@
 import argparse
 import random
 import torch
+from tqdm import tqdm
 from treys import Deck
 from treys import Evaluator
 
@@ -10,11 +11,10 @@ evaluator = Evaluator()
 
 def generate_data(num_examples, sims, output):
     print("Generating data...")
-    for i in range(num_examples):
-        print("Example " + str(i))
+    for i in tqdm(range(num_examples)):
         num_ops = random.randint(1, 10)  # Generates the number of opponents
         # This is the hand that will be evaluated using simulation
-        print(calculate_equity(sims, num_ops))
+        calculate_equity(sims, num_ops)
 
 
 def set_seed(seed):
