@@ -2,19 +2,31 @@ import argparse
 import random
 import torch
 from tqdm import tqdm
-from treys import Deck
+from treys import Deck, Card
 from treys import Evaluator
 
 
+SUIT_TO_INDEX = {1: 0, 2: 1, 4: 2, 8: 3}
 evaluator = Evaluator()
 
 
 def generate_data(num_examples, sims, output):
     print("Generating data...")
+    all_features = []
+    all_labels = []
+
     for i in tqdm(range(num_examples)):
-        num_ops = random.randint(1, 10)  # Generates the number of opponents
-        # This is the hand that will be evaluated using simulation
-        calculate_equity(sims, num_ops)
+        num_ops = random.randint(1, 10)  # Generate the number of opponents
+
+        # Generate the hand that will be evaluated using simulation
+        deck = Deck()
+        board = deck.draw(5)
+        hand = deck.draw(2)
+
+        equity = calculate_equity(sims, num_ops, board, hand)
+
+        for card in board + hand:
+            encode(card)
 
 
 def set_seed(seed):
@@ -22,16 +34,29 @@ def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    print("Set seed to " + str(seed))
+    print("\tSet seed to " + str(seed))
 
 
-def calculate_equity(sims, ops):
+def encode(card):
+    enc = [0] * 52
+
+    # Rank returns: 0 - 12
+    rank = Card.get_rank_int(card)
+    # Suite returns:
+    #   SPADE: 1
+    #   HEART: 2
+    #   DIAMO: 4
+    #   CLUBS: 8
+    suit = SUIT_TO_INDEX[Card.get_suit_int(card)]
+
+    index = rank * 4 + suit
+    enc[index] = 1
+
+    return enc
+
+
+def calculate_equity(sims, ops, board, hand):
     wins = 0
-
-    # Determine simulation scenario
-    deck = Deck()
-    board = deck.draw(5)
-    hand = deck.draw(2)
 
     score = evaluator.evaluate(hand, board)
     for i in range(sims):
@@ -66,6 +91,8 @@ def main():
 
     args = parser.parse_args()
 
+    print("Running: generate_data.py")
+    print("NILBOGtheSavior\n")
     set_seed(args.seed)
 
     generate_data(
