@@ -11,7 +11,9 @@ This README is intended to document the process of developing the neural network
 - Poker hand equity is the percentage chance your hand has to win against others.
 - To calculate hand equity, a hand is compared against the range of possible hands that opponents might hold.
 
-`Equity = (The Number of Ways to Win) / (Total Number of Possible Outcomes)`
+$$
+{Equity}=\frac{\text{The Number of Ways to Win}}{\text{Total Number of Possible Outcomes}}
+$$
 
 To calculate this, I will be implementing a **Monte Carlo simulation**.
 
