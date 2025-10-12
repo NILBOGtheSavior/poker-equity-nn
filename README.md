@@ -1,4 +1,4 @@
-# Poker AI Win Probability Predictor
+# Poker Equity Neural Network
 
 The goal of this project is to build a neural network to estimate poker equity.
 
@@ -44,4 +44,4 @@ To effectively train a neural network, relevant data must be selected and provid
 ## Generating the data
 
 1. A function that takes in data such as `hand`, `board`, `num_opponents` calculates the normalized probability.
-2. Another function converts a card using one hot encoding. Each card in the hand and on the board will be encoded
+2. Another function converts a card using one-hot encoding. Each card in the hand and on the board will be encoded
