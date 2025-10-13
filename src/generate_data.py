@@ -16,7 +16,8 @@ def generate_data(num_examples, sims, output):
     all_labels = []
 
     for i in tqdm(range(num_examples)):
-        num_ops = random.randint(1, 10)  # Generate the number of opponents
+        features = []
+        num_ops = random.randint(1, 9)  # Generate the number of opponents
 
         # Generate the hand that will be evaluated using simulation
         deck = Deck()
@@ -25,8 +26,22 @@ def generate_data(num_examples, sims, output):
 
         equity = calculate_equity(sims, num_ops, board, hand)
 
+        enc = [0] * 52
+
         for card in board + hand:
-            encode(card)
+            enc[encode(card)] = 1
+
+        features = enc + [num_ops / 9.0]
+
+        all_features.append(features)
+        all_labels.append(equity)
+
+    X = torch.tensor(all_features)
+    y = torch.tensor(all_labels)
+
+    data = {'X': X, 'y': y}
+    torch.save(data, output)
+    print(f"Saved {len(X)} examples to {output}")
 
 
 def set_seed(seed):
@@ -38,8 +53,6 @@ def set_seed(seed):
 
 
 def encode(card):
-    enc = [0] * 52
-
     # Rank returns: 0 - 12
     rank = Card.get_rank_int(card)
     # Suite returns:
@@ -50,9 +63,8 @@ def encode(card):
     suit = SUIT_TO_INDEX[Card.get_suit_int(card)]
 
     index = rank * 4 + suit
-    enc[index] = 1
 
-    return enc
+    return index
 
 
 def calculate_equity(sims, ops, board, hand):
