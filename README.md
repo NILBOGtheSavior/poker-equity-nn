@@ -37,7 +37,7 @@ Tensors are multidimensional arrays that are optimized for ML. They are an impor
 3. Train the data and save checkpoints along the way.
 4. Use trained model to predict new poker hands.
 
-## Designing the data
+## Designing the Data
 
 To effectively train a neural network, relevant data must be selected and provided for the training algorithm to be able to learn. Due to this, I made the following considerations:
 
@@ -45,9 +45,18 @@ To effectively train a neural network, relevant data must be selected and provid
 - The more opponents there are at a table, the lower the probability of winning, therefore, the number of opponents must be passed to the training algorithm.
 - The cards must be encoded so that our model can understand what cards are in the hand. To do this, a 52-dimensional binary vector is used.
 
-## Generating the data
+## Generating the Data
 
 1. A function that takes in data such as `hand`, `board`, `num_opponents` returns the normalized probability.
 2. Another function converts the hand to a binary vector and stores the array along with a normalized value of `num_opponents`.
 3. Each feature (the binary vector and normalized `num_opponents`) and label is stored as a tensor.
 4. The data is stored in an output file.
+
+## Training the Model
+
+1. A function loads saved data, and splits it into train/validation sets.
+2. A neural network must be defined.
+3. The data must be trained over multiple epochs and track loss/accuracy
+4. The trained model is saved in an output file.
+
+
