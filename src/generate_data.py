@@ -15,7 +15,7 @@ def generate_data(num_examples, sims, output):
     all_features = []
     all_labels = []
 
-    for i in tqdm(range(num_examples)):
+    for i in tqdm(range(num_examples), desc="Examples Completion"):
         features = []
         num_ops = random.randint(1, 9)  # Generate the number of opponents
 
@@ -103,8 +103,6 @@ def main():
 
     args = parser.parse_args()
 
-    print("Running: generate_data.py")
-    print("NILBOGtheSavior\n")
     set_seed(args.seed)
 
     generate_data(
@@ -115,4 +113,7 @@ def main():
 
 
 if __name__ == "__main__":
+    print("Running: generate_data.py")
+    print("NILBOGtheSavior\n")
+
     main()
