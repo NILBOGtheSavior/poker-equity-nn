@@ -11,6 +11,7 @@ __pycache__/
 # Data files
 data/*.pt
 data/*.pkl
+!data/samlpe_1k.pt
 *.csv
 
 # Model checkpoints
