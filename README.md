@@ -4,6 +4,20 @@ The goal of this project is to build a neural network to estimate poker equity.
 
 This README is intended to document the process of developing the neural network, including research, experimentation, and takeaways.
 
+## Instructions
+
+If you would like to run this neural network locally, follow these instructions to generate your datasets and train your model:
+
+1. Ensure you have **Python 3.9** installed.
+2. Clone this repository into your local directory and enter it.
+3. Create a virtual environment with the `python -m venv venv` command.
+4. Run `pip3 install -r requirements.txt` in your virtual environment.
+5. Run `python3 src/generate_data.py`.
+    - Use the `-h` tag to view the available options.
+6. Run `python3 src/train_model.py`.
+    - Use the `-h` tag to view the available options.
+    - Ensure the correct data file is selected with the `-d` tag.
+
 ## Preliminary Research
 
 ### Understanding Poker Hand Equity
