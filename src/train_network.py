@@ -21,10 +21,13 @@ class PokerEquityNN(nn.Module):
         return torch.sigmoid(logits)
 
 
-def train_model(model, dataloader, criterion, optimizer, device, epochs):
+def train_model(model, training_data, validation_data,
+                criterion, optimizer, device, epochs):
+    log = ""
     for epoch in tqdm(range(epochs), desc="Training Epochs"):
+        model.train()
         running_loss = 0.0
-        for inputs, targets in dataloader:
+        for inputs, targets in training_data:
             inputs, targets = inputs.to(device), targets.to(device)
 
             optimizer.zero_grad()
@@ -35,8 +38,24 @@ def train_model(model, dataloader, criterion, optimizer, device, epochs):
 
             running_loss += loss.item()
 
-        avg_loss = running_loss / len(dataloader)
-        print(f"Epoch [{epoch+1}/{epochs}], Loss: {avg_loss:.4f}")
+        model.eval()
+        with torch.no_grad():
+            val_loss = 0
+            for inputs, targets in validation_data:
+                inputs, targets = inputs.to(device), targets.to(device)
+
+                outputs = model(inputs).squeeze(-1)
+                loss = criterion(outputs, targets)
+
+                val_loss += loss.item()
+
+        avg_loss = running_loss / len(training_data)
+        log += f"Epoch [{epoch+1}/{epochs}], Loss: {avg_loss:.4f}\n"
+
+        avg_val_loss = val_loss / len(validation_data)
+        print(f"Validation Loss: {avg_val_loss:.4f}")
+
+    print(log)
     return model
 
 
@@ -60,22 +79,30 @@ def main():
     ).type if torch.accelerator.is_available() else "cpu"
     print(f"Using {device} device")
 
-    print("Loading data...")
+    print("Loading data...")  # TODO Clean up this mess
     data = torch.load(args.data)
     X = data['X']
     y = data['y']
+    val_data = torch.load('data/sample_1k.pt')
+    val_X = val_data['X']
+    val_y = val_data['y']
     print(f"Loaded {len(X)} examples")
     print(f"X shape: {X.shape}")
     print(f"y shape: {y.shape}")
 
-    dataset = TensorDataset(X, y)
-    dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
+    training_dataset = TensorDataset(X, y)
+    validation_dataset = TensorDataset(val_X, val_y)
+
+    training_data = DataLoader(
+        training_dataset, batch_size=args.batch_size, shuffle=True)
+    validation_data = DataLoader(
+        validation_dataset, batch_size=args.batch_size, shuffle=True)
 
     model = PokerEquityNN().to(device)
     criterion = nn.BCELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-    model = train_model(model, dataloader, criterion,
+    model = train_model(model, training_data, validation_data, criterion,
                         optimizer, device, args.epochs)
 
     torch.save(model.state_dict(), args.output)
