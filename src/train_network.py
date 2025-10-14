@@ -21,10 +21,53 @@ class PokerEquityNN(nn.Module):
         return torch.sigmoid(logits)
 
 
+class TrainPokerEquity():
+    def __init__(self, data, batch_size, epochs, output):
+        print("Initialized training class")
+        self.device = self.get_device()
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.output = output
+        self.training_data = self.get_data(data)
+        self.validation_data = self.get_data('data/sample_1k.pt')
+
+        self.model = PokerEquityNN().to(self.device)
+        self.criterion = nn.BCELoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
+
+        self.model = train_model(self.model, self.training_data,
+                                 self.validation_data, self.criterion,
+                                 self.optimizer, self.device, self.epochs)
+
+        torch.save(self.model.state_dict(), self.output)
+        print(f"Training complete. Model saved to {self.output}")
+
+    def get_device(self):
+        device = torch.accelerator.current_accelerator(
+        ).type if torch.accelerator.is_available() else "cpu"
+        print(f"Using {device} device")
+        return device
+
+    def get_data(self, datafile):
+        data = torch.load(datafile)
+        X = data['X']
+        y = data['y']
+        print(f"Loaded {len(X)} examples")
+        print(f"X shape: {X.shape}")
+        print(f"y shape: {y.shape}")
+
+        dataset = TensorDataset(X, y)
+        dataloader = DataLoader(
+            dataset, batch_size=self.batch_size, shuffle=True)
+
+        return dataloader
+
+
 def train_model(model, training_data, validation_data,
                 criterion, optimizer, device, epochs):
     log = ""
     for epoch in tqdm(range(epochs), desc="Training Epochs"):
+        # Training loop
         model.train()
         running_loss = 0.0
         for inputs, targets in training_data:
@@ -38,6 +81,7 @@ def train_model(model, training_data, validation_data,
 
             running_loss += loss.item()
 
+        # Validation loop
         model.eval()
         with torch.no_grad():
             val_loss = 0
@@ -75,38 +119,7 @@ def main():
 
     args = parser.parse_args()
 
-    device = torch.accelerator.current_accelerator(
-    ).type if torch.accelerator.is_available() else "cpu"
-    print(f"Using {device} device")
-
-    print("Loading data...")  # TODO Clean up this mess
-    data = torch.load(args.data)
-    X = data['X']
-    y = data['y']
-    val_data = torch.load('data/sample_1k.pt')
-    val_X = val_data['X']
-    val_y = val_data['y']
-    print(f"Loaded {len(X)} examples")
-    print(f"X shape: {X.shape}")
-    print(f"y shape: {y.shape}")
-
-    training_dataset = TensorDataset(X, y)
-    validation_dataset = TensorDataset(val_X, val_y)
-
-    training_data = DataLoader(
-        training_dataset, batch_size=args.batch_size, shuffle=True)
-    validation_data = DataLoader(
-        validation_dataset, batch_size=args.batch_size, shuffle=True)
-
-    model = PokerEquityNN().to(device)
-    criterion = nn.BCELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-
-    model = train_model(model, training_data, validation_data, criterion,
-                        optimizer, device, args.epochs)
-
-    torch.save(model.state_dict(), args.output)
-    print(f"Training complete. Model saved to {args.output}")
+    TrainPokerEquity(args.data, args.batch_size, args.epochs, args.output)
 
 
 if __name__ == "__main__":
