@@ -47,16 +47,32 @@ To effectively train a neural network, relevant data must be selected and provid
 
 ## Generating the Data
 
+### Overview
+
 1. A function that takes in data such as `hand`, `board`, `num_opponents` returns the normalized probability.
 2. Another function converts the hand to a binary vector and stores the array along with a normalized value of `num_opponents`.
-3. Each feature (the binary vector and normalized `num_opponents`) and label is stored as a tensor.
+3. Each feature (the binary vector and normalized `num_opponents`) and label (equity) is stored as a tensor.
 4. The data is stored in an output file.
+
+### Observations and Improvements
+
+- The program was able to run in approximately 10 minutes with 10,000 examples and 1,000 sims.
+- A larger data file with 50,000 examples will be created.
+- A small set of 1,000 examples will be created with more simulation runs with the goal of reducing noise for validation sets.
+    
+    - A graph showing equity estimates versus the number of simulations will be plotted to determine the optimal number of simulations that yields stable and low-noise results.
 
 ## Training the Model
 
-1. A function loads saved data, and splits it into train/validation sets.
-2. A neural network must be defined.
-3. The data must be trained over multiple epochs and track loss/accuracy
+### Overview
+
+1. A function loads the training dataset and the validation dataset.
+2. A neural network is defined.
+3. The data is trained over multiple epochs and track loss/accuracy
 4. The trained model is saved in an output file.
 
+### Observations and Improvements
 
+- Compared to the 1k sample, training the 10k sample has worse loss. This suggests that overfitting occurred. The model will be retrained with 50k samples to see if the pattern continues.
+- Loss will be logged in the future to ensure that results can be compared.
+- The Adam optimizer algorithm was used in initial training runs. AdamW and some others will be tested to determine the best optimizer to use for this project.
