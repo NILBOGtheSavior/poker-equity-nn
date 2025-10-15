@@ -12,6 +12,7 @@ __pycache__/
 data/*.pt
 data/*.pkl
 !data/samlpe_1k.pt
+!data/validation_1k.pt
 *.csv
 
 # Model checkpoints
