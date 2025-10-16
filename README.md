@@ -10,11 +10,12 @@ If you would like to run this neural network locally, follow these instructions 
 
 1. Ensure you have **Python 3.9** installed.
 2. Clone this repository into your local directory and enter it.
-3. Create a virtual environment with the `python -m venv venv` command.
+3. Create a virtual environment with the `python -m venv venv` command. Activate by running `source venv/bin/activate`.
 4. Run `pip3 install -r requirements.txt` in your virtual environment.
-5. Run `python3 src/generate_data.py`.
-    - Use the `-h` tag to view the available options.
-6. Run `python3 src/train_model.py`.
+5. Run `python3 src/generate_data.py` to generate the training data.
+    - Use the `-h` tag to view the available options and customize to your needs.
+    - It is recommended to use at least **10k samples** to reduce chances of overfitting.
+6. Run `python3 src/train_model.py` to train the model.
     - Use the `-h` tag to view the available options.
     - Ensure the correct data file is selected with the `-d` tag.
 
@@ -29,7 +30,7 @@ $$
 \text{Equity}=\frac{\text{The Number of Ways to Win}}{\text{Total Number of Possible Outcomes}}
 $$
 
-To calculate this, I will be implementing a **Monte Carlo simulation**.
+To calculate this, I will be implementing a **Monte Carlo simulation**, where several simulations are run and the average win rate is calculated.
 
 ### PyTorch
 
