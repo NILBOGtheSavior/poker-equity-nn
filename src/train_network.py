@@ -1,5 +1,6 @@
 import argparse
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
@@ -63,9 +64,19 @@ class TrainPokerEquity():
         return dataloader
 
 
+def plot_data(training_loss, validation_loss):
+    plt.plot(training_loss, label="Training Loss")
+    plt.plot(validation_loss, label="Validation Loss")
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.show()
+
+
 def train_model(model, training_data, validation_data,
                 criterion, optimizer, device, epochs):
-    log = ""
+    training_loss = []
+    validation_loss = []
     for epoch in tqdm(range(epochs), desc="Training Epochs"):
         # Training loop
         model.train()
@@ -96,9 +107,11 @@ def train_model(model, training_data, validation_data,
         avg_loss = running_loss / len(training_data)
         avg_val_loss = val_loss / len(validation_data)
 
-        log += f"Epoch [{epoch+1}/{epochs}], Training Loss: {avg_loss:.4f} Validation Loss: {avg_val_loss:.4f}\n"
+        training_loss.append(avg_loss)
+        validation_loss.append(avg_val_loss)
 
-    print(log)
+    plot_data(training_loss, validation_loss)
+
     return model
 
 
