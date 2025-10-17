@@ -29,11 +29,11 @@ class TrainPokerEquity():
         self.epochs = epochs
         self.output = output
         self.training_data = self.get_data(data)
-        self.validation_data = self.get_data('data/sample_1k.pt')
+        self.validation_data = self.get_data('data/validation_1k.pt')
 
         self.model = PokerEquityNN().to(self.device)
         self.criterion = nn.BCELoss()
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=1e-3)
 
         self.model = train_model(self.model, self.training_data,
                                  self.validation_data, self.criterion,
@@ -94,10 +94,9 @@ def train_model(model, training_data, validation_data,
                 val_loss += loss.item()
 
         avg_loss = running_loss / len(training_data)
-        log += f"Epoch [{epoch+1}/{epochs}], Loss: {avg_loss:.4f}\n"
-
         avg_val_loss = val_loss / len(validation_data)
-        print(f"Validation Loss: {avg_val_loss:.4f}")
+
+        log += f"Epoch [{epoch+1}/{epochs}], Training Loss: {avg_loss:.4f} Validation Loss: {avg_val_loss:.4f}\n"
 
     print(log)
     return model
